@@ -31,11 +31,13 @@ class TriviaViewController: UIViewController {
   }
 	
 	private func handlerequest() {
+		questions.removeAll()
 		TriviaQuestionService.shared.requestTrueFalse { result in
 			switch result {
 			case .success(let question):
 				DispatchQueue.main.async {
 					self.questions.append(contentsOf: question.results)
+					self.questions = question.results
 					self.questions.shuffle()
 					self.updateQuestion(withQuestionIndex: 0)
 				}
@@ -64,22 +66,38 @@ class TriviaViewController: UIViewController {
 		let filteredString = input.unicodeScalars.filter { allowCharSet.contains($0) }
 		return String(filteredString)
 	}
+	
+	private func fixText(text: String) -> String {
+		let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+			.documentType: NSAttributedString.DocumentType.html,
+			.characterEncoding: String.Encoding.utf8.rawValue
+		]
+
+		if let newTextData = text.data(using: .utf8) {
+			do {
+				let attributedString = try NSAttributedString(data: newTextData, options: options, documentAttributes: nil)
+				return attributedString.string
+			} catch {
+				// Handle the error appropriately, e.g., log it or return a default value
+			}
+		}
+		return text // Return the original text if there's an issue with conversion
+	}
   
   private func updateQuestion(withQuestionIndex questionIndex: Int) {
     currentQuestionNumberLabel.text = "Question: \(questionIndex + 1)/\(questions.count)"
     let question = questions[questionIndex]
 	  
-	  let filterQuestion = onlyAlphanumericChar(question.question)
-	  let filterCorrectAns = onlyAlphanumericChar(question.correctAnswer)
-	  let filterIncorrectAns = question.incorrectAnswers.map { onlyAlphanumericChar($0)
+	  let filterQuestion = fixText(text: question.question)
+	  let filterCorrectAns = fixText(text: question.correctAnswer)
+	  let filterIncorrectAns = question.incorrectAnswers.map { fixText(text: $0)
 	  }
 	  
-    //questionLabel.text = question.question
-    categoryLabel.text = question.category
-	  questionLabel.text = filterQuestion
-	  
+	  categoryLabel.text = question.category
+	  questionLabel.text = question.question
 	
-    let answers = ([filterCorrectAns] + filterIncorrectAns).shuffled()
+	  
+	  let answers = ([question.correctAnswer] + question.incorrectAnswers).shuffled()
 	  
 	  if question.type == "boolean" {
 		  
@@ -135,9 +153,9 @@ class TriviaViewController: UIViewController {
                                             message: "Final score: \(numCorrectQuestions)/\(questions.count)",
                                             preferredStyle: .alert)
     let resetAction = UIAlertAction(title: "Restart", style: .default) { [unowned self] _ in
-      currQuestionIndex = 0
-      numCorrectQuestions = 0
-		//Fetch a different set of question then user restarts
+		currQuestionIndex = 0
+		numCorrectQuestions = 0
+		updateQuestion(withQuestionIndex: currQuestionIndex)
 		handlerequest()
     }
     alertController.addAction(resetAction)
