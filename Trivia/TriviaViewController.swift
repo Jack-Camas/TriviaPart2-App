@@ -37,7 +37,6 @@ class TriviaViewController: UIViewController {
 			case .success(let question):
 				DispatchQueue.main.async {
 					self.questions.append(contentsOf: question.results)
-					self.questions = question.results
 					self.questions.shuffle()
 					self.updateQuestion(withQuestionIndex: 0)
 				}
@@ -94,10 +93,10 @@ class TriviaViewController: UIViewController {
 	  }
 	  
 	  categoryLabel.text = question.category
-	  questionLabel.text = question.question
+	  questionLabel.text = filterQuestion
 	
 	  
-	  let answers = ([question.correctAnswer] + question.incorrectAnswers).shuffled()
+	  let answers = ([filterCorrectAns] + filterIncorrectAns).shuffled()
 	  
 	  if question.type == "boolean" {
 		  
