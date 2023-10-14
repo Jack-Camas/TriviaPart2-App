@@ -25,7 +25,7 @@ The following **optional** features are implemented:
 
 ## Video Walkthrough
 
-![Simulator Screen Recording - iPhone 14 Pro Max - 2023-10-13 at 00 56 54](https://github.com/Jack-Camas/TriviaPart2-App/assets/48427524/bbe866db-a5ee-4391-a190-f29d96120fbd)
+![Simulator Screen Recording - iPhone 14 Pro Max - 2023-10-13 at 23 21 40](https://github.com/Jack-Camas/TriviaPart2-App/assets/48427524/fe8c90f8-62f7-44e3-8369-b93391b97eac)
 
 ## Notes
 
